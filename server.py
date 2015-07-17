@@ -1,11 +1,9 @@
 import collections
 import json
-import logging
 import math
 import psycopg2
 
 from datetime import datetime
-from datetime import time
 
 from flask import Flask
 from flask import render_template
@@ -26,7 +24,7 @@ def homepage():
 @app.route("/geojson")
 def bdys():
 
-    # logging.debug(time.clock())
+    start_time = datetime.now()
 
     # Get parameters from querystring
     map_left = request.args.get('ml')
@@ -92,11 +90,14 @@ def bdys():
 
     output = ''.join(['{"type":"FeatureCollection","features":', gj, '}'])
 
-    # logging.debug(time.clock())
+    end_time = datetime.now()
+
+    print "Data prep took " + (end_time - start_time)
 
     return Response(output, mimetype='application/json')
 
 
 if __name__ == '__main__':
+    app.debug = True
     # app.run(host='0.0.0.0', port=81)
     app.run(port=81)
