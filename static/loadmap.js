@@ -1,4 +1,5 @@
-var restUrl = "getbdys.py";
+var restUrl = "http://127.0.0.1:81/geojson";
+var restUrl = "../geojson";
 var maxStat = -999999999.0;
 var minStat = 999999999.0;
 var bdyLayer = null;
@@ -30,7 +31,7 @@ for (var i = 0; i < querystring.length; i++) {
 
 
 if (queryObj["zoom"] == undefined) {
-  startZoom = 13;
+  startZoom = 15;
 } else {
   startZoom = parseInt(queryObj["zoom"]);
 }
@@ -48,19 +49,19 @@ function init() {
     map = new L.Map('map');
 
     //load CartoDB basemap tiles
-    // var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-            // attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-            // subdomains: 'abcd',
-            // minZoom: 0,
-            // maxZoom: startZoom
-    // }).addTo(map);
+     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+             subdomains: 'abcd',
+             minZoom: 0,
+             maxZoom: 17
+     }).addTo(map);
 
-    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: startZoom
-    }).addTo(map);    
+//    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+//            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+//            subdomains: 'abcd',
+//            minZoom: 0,
+//            maxZoom: 17
+//    }).addTo(map);
     
     
 //    //Add a WMS Layer from Geoserver
@@ -72,7 +73,7 @@ function init() {
 
 
     //Set the view to a given center and zoom
-    map.setView(new L.LatLng(-33.85, 151.05), startZoom);
+    map.setView(new L.LatLng(-33.85, 151.15), startZoom);
 
     //Acknowledge the ABS Census and ATO Tax Data
     map.attributionControl.addAttribution('2011 Census data © <a href="http://www.abs.gov.au/websitedbs/D3310114.nsf/Home/%C2%A9+Copyright">ABS</a>');
@@ -301,14 +302,18 @@ function getBoundaries() {
     //Get the table/view name for the query
     var tableName;
     
-    if (bdyType == 'hex') {
-      tableName = "vw_iag_pif_hex_grid_" + areakm2;
-    } else if (bdyType == 'postcode'){
-      tableName = "vw_iag_pif_postcode";
-    } else {
-      tableName = "vw_iag_pif_hex_grid_" + areakm2; //default
-    }
-    
+//    if (bdyType == 'hex') {
+//      tableName = "vw_iag_pif_hex_grid_" + areakm2;
+//    } else if (bdyType == 'postcode'){
+//      tableName = "vw_iag_pif_postcode";
+//    } else {
+//      tableName = "vw_iag_pif_hex_grid_" + areakm2; //default
+//    }
+
+
+    tableName = 'sa1_2011_aust'
+
+
     //Build URL with querystring - selects census bdy attributes, stats and the census boundary geometries as minimised GeoJSON objects
     var ua = [];
     ua.push(restUrl);
