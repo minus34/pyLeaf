@@ -8,7 +8,8 @@ var geojsonLayer = null;
 var startZoom = 12;
 var bdyType = "";
 
-var colours = ['rgb(255,255,204)','rgb(217,240,163)','rgb(173,221,142)','rgb(120,198,121)','rgb(65,171,93)','rgb(35,132,67)','rgb(0,90,50)'];
+var colours = ['rgb(215,48,39)','rgb(252,141,89)','rgb(254,224,144)','rgb(255,255,191)','rgb(224,243,248)','rgb(145,191,219)','rgb(69,117,180)'];
+//var colours = ['rgb(255,255,204)','rgb(217,240,163)','rgb(173,221,142)','rgb(120,198,121)','rgb(65,171,93)','rgb(35,132,67)','rgb(0,90,50)'];
 //var colours = ['rgb(237,248,251)','rgb(204,236,230)','rgb(153,216,201)','rgb(102,194,164)','rgb(65,174,118)','rgb(35,139,69)','rgb(0,88,36)'];
 //var colours = ['rgb(215,48,39)','rgb(252,141,89)','rgb(254,224,139)','rgb(255,255,191)','rgb(217,239,139)','rgb(145,207,96)','rgb(26,152,80)'];
 
@@ -49,20 +50,20 @@ function init() {
     map = new L.Map('map');
 
     //load CartoDB basemap tiles
-     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-             subdomains: 'abcd',
-             minZoom: 0,
-             maxZoom: 12
-     }).addTo(map);
+//     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+//             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+//             subdomains: 'abcd',
+//             minZoom: 0,
+//             maxZoom: 12
+//     }).addTo(map);
 
-//    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-//            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-//            subdomains: 'abcd',
-//            minZoom: 0,
-//            maxZoom: 17
-//    }).addTo(map);
-    
+    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 12
+    }).addTo(map);
+
     
 //    //Add a WMS Layer from Geoserver
 //    var cloudmade = new L.TileLayer.WMS("http://localhost:8080/geoserver/Test/wms", {
@@ -118,6 +119,20 @@ function init() {
 //};
 
 //info.addTo(map);
+
+// get opacity depending on population density value
+function getOpacity(d) {
+
+  return d > 10000  ? 0.8:
+           d > 5000 ? 0.7:
+           d > 2500 ? 0.6:
+           d > 1000 ? 0.5:
+           d > 500  ? 0.4:
+           d > 250  ? 0.3:
+           d > 100  ? 0.2:
+                      0.1;
+}
+
 
 // get color depending on population density value
 function getColor(d) {
@@ -206,11 +221,20 @@ function style(feature) {
     return {
         weight: 1,
         opacity: 0.1,
-        color: getColor(colVal),
+        color: '#C00',
         //dashArray: '3',
-        fillOpacity: 0.5,
-        fillColor: getColor(colVal)
+        fillOpacity: getOpacity(colVal),
+        fillColor: '#C00'
     };
+
+//    return {
+//        weight: 1,
+//        opacity: 0.1,
+//        color: getColor(colVal),
+//        //dashArray: '3',
+//        fillOpacity: 0.5,
+//        fillColor: getColor(colVal)
+//    };
 }
 
 function highlightFeature(e) {
