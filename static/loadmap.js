@@ -8,8 +8,8 @@ var geojsonLayer = null;
 var startZoom = 12;
 var bdyType = "";
 
-//var colours = ['rgb(255,255,204)','rgb(217,240,163)','rgb(173,221,142)','rgb(120,198,121)','rgb(65,171,93)','rgb(35,132,67)','rgb(0,90,50)'];
-var colours = ['rgb(237,248,251)','rgb(204,236,230)','rgb(153,216,201)','rgb(102,194,164)','rgb(65,174,118)','rgb(35,139,69)','rgb(0,88,36)'];
+var colours = ['rgb(255,255,204)','rgb(217,240,163)','rgb(173,221,142)','rgb(120,198,121)','rgb(65,171,93)','rgb(35,132,67)','rgb(0,90,50)'];
+//var colours = ['rgb(237,248,251)','rgb(204,236,230)','rgb(153,216,201)','rgb(102,194,164)','rgb(65,174,118)','rgb(35,139,69)','rgb(0,88,36)'];
 //var colours = ['rgb(215,48,39)','rgb(252,141,89)','rgb(254,224,139)','rgb(255,255,191)','rgb(217,239,139)','rgb(145,207,96)','rgb(26,152,80)'];
 
 //Code from http://forum.jquery.com/topic/getting-value-from-a-querystring
@@ -205,8 +205,8 @@ function style(feature) {
 
     return {
         weight: 1,
-        opacity: 0.4,
-        color: "#AAA",
+        opacity: 0.1,
+        color: getColor(colVal),
         //dashArray: '3',
         fillOpacity: 0.5,
         fillColor: getColor(colVal)
