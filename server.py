@@ -92,10 +92,85 @@ def bdys():
 
     end_time = datetime.now()
 
-    print "Data prep took " + (end_time - start_time)
+    # print "Data prep took " + (end_time - start_time)
 
     return Response(output, mimetype='application/json')
 
+
+@app.route("/hex")
+def hexes():
+
+    start_time = datetime.now()
+
+    # Get parameters from querystring
+    map_left = request.args.get('ml')
+    map_bottom = request.args.get('mb')
+    map_right = request.args.get('mr')
+    map_top = request.args.get('mt')
+    zoom_level = int(request.args.get('z'))
+    table_name = request.args.get('t')
+
+    # Set the number of decimal places for the output GeoJSON to reduce response size & speed up rendering
+    tolerance = (tile_width / math.pow(2.0, float(zoom_level))) / metres2degrees
+    places = 0
+    precision = 0.1
+    # grid_string = "0."
+
+    while precision > tolerance:
+        places += 1
+        precision /= 10
+        # grid_string += "0"
+
+    places += 1
+    # grid_string += "1"
+
+    # print str(places)
+    # print grid_string
+
+    # Try to connect to Postgres
+    try:
+        conn = psycopg2.connect("dbname='iadpdev' user='postgres' password='password'")
+    except psycopg2.Error:
+        return "Unable to connect to the database."
+
+    cur = conn.cursor()
+
+    # The query
+    sql = "SELECT count, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
+          "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
+        .format(places, table_name, map_left, map_bottom, map_right, map_top)
+
+    try:
+        cur.execute(sql)
+    except psycopg2.Error:
+        return "I can't SELECT : " + sql
+
+    # Create the GeoJSON output with an array of dictionaries containing the field names and values
+    rows = cur.fetchall()
+    dicts = []
+
+    for row in rows:
+        rec = collections.OrderedDict()
+        rec['type'] = 'Feature'
+
+        props = collections.OrderedDict()
+        # props['id'] = row[0]
+        props['count'] = row[0]
+
+        rec['properties'] = json.dumps(props)
+        rec['geometry'] = row[1]
+
+        dicts.append(rec)
+
+    gj = json.dumps(dicts).replace(" ", "").replace("\\", "").replace('"{', '{').replace('}"', '}')
+
+    output = ''.join(['{"type":"FeatureCollection","features":', gj, '}'])
+
+    end_time = datetime.now()
+
+    # print "Data prep took " + (end_time - start_time)
+
+    return Response(output, mimetype='application/json')
 
 if __name__ == '__main__':
     app.debug = True

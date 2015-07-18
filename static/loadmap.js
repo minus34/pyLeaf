@@ -1,11 +1,11 @@
-var restUrl = "http://127.0.0.1:81/geojson";
-var restUrl = "../geojson";
+//var restUrl = "http://127.0.0.1:81/hex";
+var restUrl = "../hex";
 var maxStat = -999999999.0;
 var minStat = 999999999.0;
 var bdyLayer = null;
 var map = null;
 var geojsonLayer = null;
-var startZoom = 0;
+var startZoom = 12;
 var bdyType = "";
 
 //var colours = ['rgb(255,255,204)','rgb(217,240,163)','rgb(173,221,142)','rgb(120,198,121)','rgb(65,171,93)','rgb(35,132,67)','rgb(0,90,50)'];
@@ -30,15 +30,15 @@ for (var i = 0; i < querystring.length; i++) {
 }
 
 
-if (queryObj["zoom"] == undefined) {
-  startZoom = 15;
-} else {
-  startZoom = parseInt(queryObj["zoom"]);
-}
+//if (queryObj["zoom"] == undefined) {
+//  startZoom = 12;
+//} else {
+//  startZoom = parseInt(queryObj["zoom"]);
+//}
 
-//Get table name to display
-bdyType = queryObj["bdy"];
-if (bdyType == undefined) bdyType = "hex";
+////Get table name to display
+//bdyType = queryObj["bdy"];
+//if (bdyType == undefined) bdyType = "hex";
 
 
 function init() {
@@ -53,7 +53,7 @@ function init() {
              attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
              subdomains: 'abcd',
              minZoom: 0,
-             maxZoom: 17
+             maxZoom: 12
      }).addTo(map);
 
 //    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
@@ -137,13 +137,13 @@ function getColor(d) {
     //d *= 100; //Convert to percentages
 
   //Colorbrewer2.org Theme
-  return d > 7 ? colours[6]:
-           d > 6 ? colours[5]:
-           d > 5 ? colours[4]:
-           d > 4 ? colours[3]:
-           d > 3 ? colours[2]:
-           d > 2 ? colours[1]:
-           d > 1 ? colours[0]:
+  return d > 10000  ? colours[6]:
+           d > 5000 ? colours[5]:
+           d > 2500 ? colours[4]:
+           d > 1000 ? colours[3]:
+           d > 500  ? colours[2]:
+           d > 250  ? colours[1]:
+           d > 100  ? colours[0]:
                       colours[0];
     
   // //Oranges
@@ -288,8 +288,8 @@ function getBoundaries() {
     zoomLevel = map.getZoom();
 
     //Get area (km2) to display
-    var areakm2 = getArea(zoomLevel);
-    
+//    var areakm2 = getArea(zoomLevel);
+
     // if (zoomLevel < startZoom) {
       // areakm2 = Math.pow(2, (startZoom - zoomLevel)).toString();
     // } else {
@@ -297,11 +297,13 @@ function getBoundaries() {
       // areakm2 = "0_5";
     // }
     console.log(zoomLevel);
-    console.log(areakm2);
+
 
     //Get the table/view name for the query
-    var tableName;
-    
+    var tableName = 'grid_' + getWidth(zoomLevel) + '_counts';
+
+    console.log(tableName);
+
 //    if (bdyType == 'hex') {
 //      tableName = "vw_iag_pif_hex_grid_" + areakm2;
 //    } else if (bdyType == 'postcode'){
@@ -309,9 +311,6 @@ function getBoundaries() {
 //    } else {
 //      tableName = "vw_iag_pif_hex_grid_" + areakm2; //default
 //    }
-
-
-    tableName = 'sa1_2011_aust'
 
 
     //Build URL with querystring - selects census bdy attributes, stats and the census boundary geometries as minimised GeoJSON objects
@@ -351,16 +350,16 @@ function loadBdysNew(json) {
     }
 }
 
-function getArea(zoomLevel){
+function getWidth(zoomLevel){
 
   var minzoom = 13;
 
-  if (zoomLevel >= minzoom) {
+  if (zoomLevel > minzoom) {
     return "0_5"
-  } else if (minzoom - zoomLevel == 1) {
+  } else if (zoomLevel == minzoom) {
     return "1"
   } else {
-    return Math.pow(2, (startZoom - zoomLevel) - 1).toString()
+    return Math.pow(2, (minzoom - zoomLevel) - 1).toString()
   }
 }
 
