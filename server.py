@@ -168,7 +168,7 @@ def hexes():
 
     end_time = datetime.now()
 
-    # print "Data prep took " + (end_time - start_time)
+    print "Data prep took " + str(end_time - start_time)
 
     return Response(output, mimetype='application/json')
 

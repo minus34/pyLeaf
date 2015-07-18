@@ -50,19 +50,19 @@ function init() {
     map = new L.Map('map');
 
     //load CartoDB basemap tiles
-//     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-//             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-//             subdomains: 'abcd',
-//             minZoom: 0,
-//             maxZoom: 12
-//     }).addTo(map);
+     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+             subdomains: 'abcd',
+             minZoom: 0,
+             maxZoom: 12
+     }).addTo(map);
 
-    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: 12
-    }).addTo(map);
+//    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+//            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+//            subdomains: 'abcd',
+//            minZoom: 0,
+//            maxZoom: 12
+//    }).addTo(map);
 
     
 //    //Add a WMS Layer from Geoserver
@@ -160,58 +160,8 @@ function getColor(d) {
            d > 250  ? colours[1]:
            d > 100  ? colours[0]:
                       colours[0];
-    
-  // //Oranges
-  // return d > 7 ? '#800026':
-         // d > 6 ? '#BD0026':
-         // d > 5 ? '#E31A1C':
-         // d > 4 ? '#FC4E2A':
-         // d > 3 ? '#FD8D3C':
-         // d > 2 ? '#FEB24C':
-         // d > 1 ? '#FED976':
-                    // '#FFEDA0';
 
-  //Blue to red - looks dumb
-  // return d > 7 ? '#FF0000':
-           // d > 6 ? '#FFA500':
-           // d > 5 ? '#FFA500':
-           // d > 4 ? '#FFFF00':
-           // d > 3 ? '#FFFF00':
-           // d > 2 ? '#00FF00':
-           // d > 1 ? '#0000FF':
-                      // '#0000FF';                      
-                      
-  //Greens
-  // return d > 7 ? '#00FF00':
-           // d > 6 ? '#00DD00':
-           // d > 5 ? '#00BB00':
-           // d > 4 ? '#009900':
-           // d > 3 ? '#007700':
-           // d > 2 ? '#005500':
-           // d > 1 ? '#003300':
-                      // '#003300';
-
-  // //Blues
-  // return d > 7 ? '#0000FF':
-           // d > 6 ? '#0000DD':
-           // d > 5 ? '#0000BB':
-           // d > 4 ? '#000099':
-           // d > 3 ? '#000077':
-           // d > 2 ? '#000055':
-           // d > 1 ? '#000033':
-                      // '#000033';                      
-
-  // //Reds
-  // return d > 7 ? '#FF0000':
-           // d > 6 ? '#DD0000':
-           // d > 5 ? '#BB0000':
-           // d > 4 ? '#990000':
-           // d > 3 ? '#770000':
-           // d > 2 ? '#550000':
-           // d > 1 ? '#330000':
-                      // '#330000';
-                      
-                      }
+}
 
 function style(feature) {
     //TEST MAP THEME ONLY - ARBITRARY VALUES...
@@ -220,7 +170,7 @@ function style(feature) {
 
     return {
         weight: 1,
-        opacity: 0.1,
+        opacity: 0.0,
         color: '#C00',
         //dashArray: '3',
         fillOpacity: getOpacity(colVal),
@@ -376,7 +326,7 @@ function loadBdysNew(json) {
 
 function getWidth(zoomLevel){
 
-  var minzoom = 13;
+  var minzoom = 12;
 
   if (zoomLevel > minzoom) {
     return "0_5"
