@@ -159,7 +159,7 @@ def hexes():
     #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom) " \
     #       "GROUP BY round(log({6}, count), 1)"\
     #     .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
-    sql = "SELECT count, round(log({6}, count), 1)::float, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
+    sql = "SELECT count, round(log({6}, count) * 0.8, 1)::float, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
           "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
         .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
 
@@ -171,6 +171,11 @@ def hexes():
     # Create the GeoJSON output with an array of dictionaries containing the field names and values
     rows = cur.fetchall()
     dicts = []
+
+    mid_time = datetime.now()
+
+    print "Query took " + str(mid_time - start_time)
+
 
     for row in rows:
         rec = collections.OrderedDict()
