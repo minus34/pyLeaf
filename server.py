@@ -108,7 +108,10 @@ def hexes():
     map_right = request.args.get('mr')
     map_top = request.args.get('mt')
     zoom_level = int(request.args.get('z'))
-    table_name = request.args.get('t')
+    # table_name = request.args.get('t')
+
+    # Zoom level determines which hex grid to use
+    table_name = 'grid_' + get_width(zoom_level) + '_counts'
 
     # Set the number of decimal places for the output GeoJSON to reduce response size & speed up rendering
     tolerance = (tile_width / math.pow(2.0, float(zoom_level))) / metres2degrees
@@ -135,10 +138,30 @@ def hexes():
 
     cur = conn.cursor()
 
-    # The query
-    sql = "SELECT count, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
+    # sql = "SELECT min(count) FROM hex.{1} " \
+    #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
+    #     .format(places, table_name, map_left, map_bottom, map_right, map_top)
+    #
+    # cur.execute(sql)
+    # min_count = cur.fetchone()[0]
+    # print min_count
+
+    sql = "SELECT max(count) FROM hex.{1} " \
           "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
         .format(places, table_name, map_left, map_bottom, map_right, map_top)
+
+    cur.execute(sql)
+    max_count = cur.fetchone()[0]
+    print max_count
+
+    # The query
+    # sql = "SELECT round(log({6}, count), 1)::float, ST_AsGeoJSON((ST_Dump(ST_Union(geom))).geom, {0}, 0) FROM hex.{1} " \
+    #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom) " \
+    #       "GROUP BY round(log({6}, count), 1)"\
+    #     .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
+    sql = "SELECT count, round(log({6}, count), 1)::float, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
+          "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
+        .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
 
     try:
         cur.execute(sql)
@@ -154,11 +177,12 @@ def hexes():
         rec['type'] = 'Feature'
 
         props = collections.OrderedDict()
-        # props['id'] = row[0]
-        props['count'] = row[0]
+        props['cnt'] = row[0]
+        props['op'] = row[1]
+        # props['lop'] = row[2]
 
         rec['properties'] = json.dumps(props)
-        rec['geometry'] = row[1]
+        rec['geometry'] = row[2]
 
         dicts.append(rec)
 
@@ -171,6 +195,19 @@ def hexes():
     print "Data prep took " + str(end_time - start_time)
 
     return Response(output, mimetype='application/json')
+
+
+def get_width(zoom_level):
+
+    min_zoom = 12
+
+    if zoom_level > min_zoom:
+        return "0_5"
+    elif zoom_level == min_zoom:
+        return "1"
+    else:
+        return str(int(math.pow(2, (min_zoom - zoom_level) - 1)))
+
 
 if __name__ == '__main__':
     app.debug = True

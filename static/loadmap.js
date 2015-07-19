@@ -5,7 +5,7 @@ var minStat = 999999999.0;
 var bdyLayer = null;
 var map = null;
 var geojsonLayer = null;
-var startZoom = 12;
+var startZoom = 11;
 var bdyType = "";
 
 var colours = ['rgb(215,48,39)','rgb(252,141,89)','rgb(254,224,144)','rgb(255,255,191)','rgb(224,243,248)','rgb(145,191,219)','rgb(69,117,180)'];
@@ -50,19 +50,19 @@ function init() {
     map = new L.Map('map');
 
     //load CartoDB basemap tiles
-     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-             subdomains: 'abcd',
-             minZoom: 0,
-             maxZoom: 12
-     }).addTo(map);
+//     var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
+//             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+//             subdomains: 'abcd',
+//             minZoom: 0,
+//             maxZoom: 12
+//     }).addTo(map);
 
-//    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-//            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-//            subdomains: 'abcd',
-//            minZoom: 0,
-//            maxZoom: 12
-//    }).addTo(map);
+    var tiles = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 12
+    }).addTo(map);
 
     
 //    //Add a WMS Layer from Geoserver
@@ -120,26 +120,50 @@ function init() {
 
 //info.addTo(map);
 
-// get opacity depending on population density value
-function getOpacity(d) {
+function style(feature) {
 
-  return d > 10000  ? 0.8:
-           d > 5000 ? 0.7:
-           d > 2500 ? 0.6:
-           d > 1000 ? 0.5:
-           d > 500  ? 0.4:
-           d > 250  ? 0.3:
-           d > 100  ? 0.2:
-                      0.1;
+    var colVal = feature.properties.cnt;
+    var opacityVal = feature.properties.op;
+
+    return {
+        weight: 1,
+        opacity: 0.0,
+        color: '#E30',
+        //dashArray: '3',
+        fillOpacity: opacityVal,
+        fillColor: '#E30'
+    };
+
+//    return {
+//        weight: 1,
+//        opacity: 0.1,
+//        color: getColor(colVal),
+//        //dashArray: '3',
+//        fillOpacity: 0.5,
+//        fillColor: getColor(colVal)
+//    };
 }
 
+
+//// get opacity depending on population density value
+//function getOpacity(d) {
+//
+//  return d > 10000  ? 0.8:
+//           d > 5000 ? 0.7:
+//           d > 2500 ? 0.6:
+//           d > 1000 ? 0.5:
+//           d > 500  ? 0.4:
+//           d > 250  ? 0.3:
+//           d > 100  ? 0.2:
+//                      0.1;
+//}
 
 // get color depending on population density value
 function getColor(d) {
 
      // //Convert value for the zoom level
     // var factor;
-    
+
     // if (zoomLevel < startZoom) {
       // factor = Math.pow(4, (startZoom - zoomLevel)) / 2;
     // } else {
@@ -163,38 +187,16 @@ function getColor(d) {
 
 }
 
-function style(feature) {
-    //TEST MAP THEME ONLY - ARBITRARY VALUES...
-    //colVal = feature.id.substring(4, 6)
-    colVal = feature.properties.count;
-
-    return {
-        weight: 1,
-        opacity: 0.0,
-        color: '#C00',
-        //dashArray: '3',
-        fillOpacity: getOpacity(colVal),
-        fillColor: '#C00'
-    };
-
-//    return {
-//        weight: 1,
-//        opacity: 0.1,
-//        color: getColor(colVal),
-//        //dashArray: '3',
-//        fillOpacity: 0.5,
-//        fillColor: getColor(colVal)
-//    };
-}
 
 function highlightFeature(e) {
     var layer = e.target;
 
     layer.setStyle({
-        weight: 5,
-        color: '#0D0',
+        weight: 3,
+        color: '#00F',
+        opacity: 0.8
         //dashArray: '',
-        fillOpacity: 0.9
+        //fillOpacity: 0.0
     });
 
     if (!L.Browser.ie && !L.Browser.opera) {
@@ -273,10 +275,10 @@ function getBoundaries() {
     console.log(zoomLevel);
 
 
-    //Get the table/view name for the query
-    var tableName = 'grid_' + getWidth(zoomLevel) + '_counts';
-
-    console.log(tableName);
+//    //Get the table/view name for the query
+//    var tableName = 'grid_' + getWidth(zoomLevel) + '_counts';
+//
+//    console.log(tableName);
 
 //    if (bdyType == 'hex') {
 //      tableName = "vw_iag_pif_hex_grid_" + areakm2;
@@ -300,8 +302,8 @@ function getBoundaries() {
     ua.push(ne.lat.toString());
     ua.push("&z=");
     ua.push(zoomLevel.toString());
-    ua.push("&t=");
-    ua.push(tableName);
+//    ua.push("&t=");
+//    ua.push(tableName);
     var reqStr = ua.join('');
 
     //Fire off AJAX request
@@ -324,16 +326,4 @@ function loadBdysNew(json) {
     }
 }
 
-function getWidth(zoomLevel){
-
-  var minzoom = 12;
-
-  if (zoomLevel > minzoom) {
-    return "0_5"
-  } else if (zoomLevel == minzoom) {
-    return "1"
-  } else {
-    return Math.pow(2, (minzoom - zoomLevel) - 1).toString()
-  }
-}
 
