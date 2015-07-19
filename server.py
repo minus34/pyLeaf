@@ -108,7 +108,6 @@ def hexes():
     map_right = request.args.get('mr')
     map_top = request.args.get('mt')
     zoom_level = int(request.args.get('z'))
-    # table_name = request.args.get('t')
 
     # Zoom level determines which hex grid to use
     table_name = 'grid_' + get_width(zoom_level) + '_counts'
@@ -117,18 +116,12 @@ def hexes():
     tolerance = (tile_width / math.pow(2.0, float(zoom_level))) / metres2degrees
     places = 0
     precision = 0.1
-    # grid_string = "0."
 
     while precision > tolerance:
         places += 1
         precision /= 10
-        # grid_string += "0"
 
     places += 1
-    # grid_string += "1"
-
-    # print str(places)
-    # print grid_string
 
     # Try to connect to Postgres
     try:
@@ -146,11 +139,11 @@ def hexes():
     # min_count = cur.fetchone()[0]
     # print min_count
 
-    sql = "SELECT max(count) FROM hex.{1} " \
-          "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
-        .format(places, table_name, map_left, map_bottom, map_right, map_top)
-
-    cur.execute(sql)
+    cur.execute("SELECT max(count) FROM hex.{0}".format(table_name,))
+    # sql = "SELECT max(count) FROM hex.{0} " \
+    #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({1}, {2}), ST_Point({3}, {4})), 4283),geom)"\
+    #     .format(table_name, map_left, map_bottom, map_right, map_top)
+    # cur.execute(sql)
     max_count = cur.fetchone()[0]
     print max_count
 
@@ -159,9 +152,14 @@ def hexes():
     #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom) " \
     #       "GROUP BY round(log({6}, count), 1)"\
     #     .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
-    sql = "SELECT count, round(log({6}, count) * 0.8, 1)::float, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
-          "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
+    # sql = "SELECT count, round(log({6}, count) * 0.8, 1)::float, ST_AsGeoJSON(geom, {0}, 0) FROM hex.{1} " \
+    #       "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_Point({2}, {3}), ST_Point({4}, {5})), 4283),geom)"\
+    #     .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
+    sql = "SELECT count, round(log({6}, count) * 0.8, 1)::float, geojson FROM hex.{1} " \
+          "WHERE ST_Intersects(ST_SetSRID(ST_MakeBox2D(ST_MakePoint({2}, {3}), ST_MakePoint({4}, {5})), 4283),geom)"\
         .format(places, table_name, map_left, map_bottom, map_right, map_top, max_count)
+
+    print sql
 
     try:
         cur.execute(sql)
@@ -175,7 +173,6 @@ def hexes():
     mid_time = datetime.now()
 
     print "Query took " + str(mid_time - start_time)
-
 
     for row in rows:
         rec = collections.OrderedDict()
